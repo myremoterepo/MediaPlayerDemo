@@ -1,0 +1,103 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".MainActivity">
+
+    <Button
+        android:id="@+id/btn_start"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="@string/start"/>
+
+    <Button
+        android:id="@+id/btn_end"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_toRightOf="@id/btn_start"
+        android:text="@string/stop"
+        android:layout_toEndOf="@id/btn_start"/>
+
+    <TextView
+        android:id="@+id/qimo_state"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:text="@string/qimo_dead"
+        android:layout_alignParentEnd="true"
+        android:layout_marginTop="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginEnd="10dp"
+        android:textSize="15sp"/>
+    <TextView
+        android:id="@+id/airplay_state"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:text="@string/airplay_dead"
+        android:layout_below="@id/qimo_state"
+        android:layout_alignParentEnd="true"
+        android:layout_marginTop="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginEnd="10dp"
+        android:textSize="15sp"/>
+    <TextView
+        android:id="@+id/pushservice_state"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentRight="true"
+        android:text="@string/pushservice_dead"
+        android:layout_below="@id/airplay_state"
+        android:layout_alignParentEnd="true"
+        android:layout_marginTop="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginEnd="10dp"
+        android:textSize="15sp"/>
+    
+    <VideoView
+        android:id="@+id/video_player"
+        android:layout_width="192dp"
+        android:layout_height="108dp"
+        android:layout_below="@id/pushservice_state"/>
+
+    <SurfaceView
+        android:id="@+id/video_surface"
+        android:layout_width="108dp"
+        android:layout_height="192dp"
+        android:layout_below="@id/pushservice_state"
+        android:layout_alignParentRight="true"
+        android:layout_alignParentEnd="true"/>
+
+    <RelativeLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true">
+        <Button
+            android:id="@+id/control_playback"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/control_playback"/>
+        <Button
+            android:id="@+id/control_stop"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_toRightOf="@id/control_playback"
+            android:layout_marginLeft="5dp"
+            android:text="@string/control_stop"
+            android:layout_toEndOf="@id/control_playback"
+            android:layout_marginStart="5dp"/>
+
+        <Button
+            android:id="@+id/control_seek"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="5dp"
+            android:text="@string/control_seek"
+            android:layout_toRightOf="@id/control_stop"
+            android:layout_marginStart="5dp"
+            android:layout_toEndOf="@id/control_stop"/>
+    </RelativeLayout>
+
+</RelativeLayout>
