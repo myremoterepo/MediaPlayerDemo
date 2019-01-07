@@ -246,17 +246,19 @@ public class MainActivity extends AppCompatActivity implements PSListenerImpl.Pl
         runOnUiThread(new Runnable() {
             @Override
             public void run() {
-                if (TextUtils.isEmpty(url) || mPlayer == null) {
-                    Log.d("fzf", "url is empty");
-                    return;
+                synchronized (PSListenerImpl.mVideoLock) {
+                    if (TextUtils.isEmpty(url) || mPlayer == null) {
+                        Log.d("fzf", "url is empty");
+                        return;
+                    }
+                    Log.d("fzf", "url is " + url);
+                    MainActivity.this.session = session;
+                    Uri uri = Uri.parse(url);
+                    mPlayer.setVideoURI(uri);
+                    mPlayer.seekTo((int) history);
+                    mPlayer.start();
+                    PSCallbackInfoManager.getInstance().setMeidaPlay(session, curposition);
                 }
-                Log.d("fzf", "url is " + url);
-                MainActivity.this.session = session;
-                Uri uri = Uri.parse(url);
-                mPlayer.setVideoURI(uri);
-                mPlayer.seekTo((int) history);
-                mPlayer.start();
-                PSCallbackInfoManager.getInstance().setMeidaPlay(session, curposition);
             }
         });
 

@@ -29,32 +29,33 @@ public class PSListenerImpl implements PSMessageListener {
     public QimoExecutionResult onStart(MediaInfo mediaInfo) {
         Log.d(TAG, "onStart mediainfo=" + mediaInfo.session);
         QimoExecutionResult result = new QimoExecutionResult();
-        session = mediaInfo.session;
-        mediaType = mediaInfo.mediaType;
-        if (mediaInfo.mediaType == MediaInfo.MEDIA_TYPE_VIDEO) {
-            synchronized (mVideoLock) {
-                if (!TextUtils.isEmpty(session) && mediaType == MediaInfo.MEDIA_TYPE_VIDEO) {
-                    stopPreviousVideo(session);
-                }
+        synchronized (mVideoLock) {
+            if (!TextUtils.isEmpty(session)) {
+                stopPreviousVideo(session);
+            }
+            session = mediaInfo.session;
+            mediaType = mediaInfo.mediaType;
+            if (mediaInfo.mediaType == MediaInfo.MEDIA_TYPE_VIDEO) {
+                Log.d(TAG, "start play video");
                 PSCallbackInfoManager.getInstance().updateMediaInfo(mediaInfo);
                 mCallback.startPlay(mediaInfo.session, mediaInfo.videoInfo.uri, mediaInfo.videoInfo.history);
+            } else if (mediaInfo.mediaType == MediaInfo.MEDIA_TYPE_AUDIO) {
+                Log.d(TAG, "start play audio");
+                PSCallbackInfoManager.getInstance().updateMediaInfo(mediaInfo);
+                mCallback.startAudio(mediaInfo.session);
+            } else if (mediaInfo.mediaType == MediaInfo.MEDIA_TYPE_PICTURE) {
+                Log.d(TAG, "start play picture");
+                PSCallbackInfoManager.getInstance().updateMediaInfo(mediaInfo);
+                mCallback.startPicture(mediaInfo.session);
+            } else if (mediaInfo.mediaType == MediaInfo.MEDIA_TYPE_MIRROR) {
+                Log.d(TAG, "start play mirror");
+                PSCallbackInfoManager.getInstance().updateMediaInfo(mediaInfo);
+                PSCallbackInfoManager.getInstance().setMeidaPlay(mediaInfo.session, 0);
+            } else {
+                Log.d(TAG, "unknown media type");
+                result.result = false;
+                return result;
             }
-        } else if (mediaInfo.mediaType == MediaInfo.MEDIA_TYPE_AUDIO) {
-            Log.d(TAG, "start play audio");
-            PSCallbackInfoManager.getInstance().updateMediaInfo(mediaInfo);
-            mCallback.startAudio(mediaInfo.session);
-        } else if (mediaInfo.mediaType == MediaInfo.MEDIA_TYPE_PICTURE) {
-            Log.d(TAG, "start play picture");
-            PSCallbackInfoManager.getInstance().updateMediaInfo(mediaInfo);
-            mCallback.startPicture(mediaInfo.session);
-        } else if (mediaInfo.mediaType == MediaInfo.MEDIA_TYPE_MIRROR) {
-            Log.d(TAG, "start play mirror");
-            PSCallbackInfoManager.getInstance().updateMediaInfo(mediaInfo);
-            PSCallbackInfoManager.getInstance().setMeidaPlay(mediaInfo.session, 0);
-        } else {
-            Log.d(TAG, "unknown media type");
-            result.result = false;
-            return result;
         }
 
         result.result = true;
@@ -62,6 +63,7 @@ public class PSListenerImpl implements PSMessageListener {
     }
 
     private void stopPreviousVideo(String session) {
+        Log.d(TAG, "stopPreviousVideo session=" + session);
         mCallback.stopPlay(session);
     }
 
@@ -269,6 +271,11 @@ public class PSListenerImpl implements PSMessageListener {
     public boolean onSetPlayMode(int i) {
         Log.d(TAG, "onSetPlayMode mode=" + i);
         return false;
+    }
+
+    @Override
+    public Object controlCommand(String s, Object... objects) throws Exception {
+        return null;
     }
 
     public interface PlayerCallback{
