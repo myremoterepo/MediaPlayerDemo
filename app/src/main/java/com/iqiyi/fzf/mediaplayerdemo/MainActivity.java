@@ -151,7 +151,7 @@ public class MainActivity extends AppCompatActivity implements PSListenerImpl.Pl
         configInfo.cachePath = getCacheDir().getAbsolutePath() + "/airplay";
         configInfo.deviceId = "QD10011027718A100008";
         configInfo.uuid = "707a-a167-1526-e144";
-        configInfo.deviceName = "test";
+        configInfo.deviceName = "LeaveMeAlone";
         configInfo.hardOper = 0;
         configInfo.hardVersion = "4";
         configInfo.targetInterface = "wlan0";
@@ -159,10 +159,25 @@ public class MainActivity extends AppCompatActivity implements PSListenerImpl.Pl
         configInfo.featureBitmap = String.valueOf(QIMO_VIDEO_PUSH
                 + QIMO_PICTURE_PUSH
                 + QIMO_NETVIDEO_PUSH
+                + DEVICE_RENAME
+                + DEVICE_UPDATE_CHECK
+                + FEEDBACK
+                + EARPHONE
+                + SUBTITLE
+                + CEC
+                + IGNORE_WIFI
+                + HDMI_OUTPUT_ZOOM
+                + REMOTE_FORBID
+                + DEVICE_REBOOT
+                + REMOTE_FORBID_INDIVIDUAL
+                + SCREEN_CAPTURE
+                + QIMO_OFFLINE
                 + MIRROR_QUALITY
                 + PICTURE_ZOOM
                 + PLAYBACK_SPEED
-                + DELAY_EXIT_VIDEO);
+                + DELAY_EXIT_VIDEO
+                + WIFI_DISPLAY
+                + OFFLINE_CACHE);
         PSListenerImpl psListener = new PSListenerImpl(this);
         PSServiceManager.ServiceStateCallback stateCallback = new PSServiceManager.ServiceStateCallback() {
             @Override
@@ -272,6 +287,7 @@ public class MainActivity extends AppCompatActivity implements PSListenerImpl.Pl
                 synchronized (PSListenerImpl.mVideoLock) {
                     mPlayer.stopPlayback();
                     PSCallbackInfoManager.getInstance().setMediaStop(session);
+                    PSListenerImpl.session = null;
                 }
             }
         });
@@ -297,7 +313,9 @@ public class MainActivity extends AppCompatActivity implements PSListenerImpl.Pl
             public void run() {
                 Log.d("fzf", "seekTo..............." + position);
                 curposition = position;
+                mPlayer.pause();
                 mPlayer.seekTo(position);
+                mPlayer.start();
             }
         });
     }
@@ -391,7 +409,7 @@ public class MainActivity extends AppCompatActivity implements PSListenerImpl.Pl
 
     @Override
     public void changeMirrorSize(final int width, final int height) {
-        runOnUiThread(new Runnable() {
+        /*runOnUiThread(new Runnable() {
             @Override
             public void run() {
                 RelativeLayout.LayoutParams param = (RelativeLayout.LayoutParams) mSurfaceView.getLayoutParams();
@@ -399,6 +417,6 @@ public class MainActivity extends AppCompatActivity implements PSListenerImpl.Pl
                 param.height = height;
                 mSurfaceView.setLayoutParams(param);
             }
-        });
+        });*/
     }
 }

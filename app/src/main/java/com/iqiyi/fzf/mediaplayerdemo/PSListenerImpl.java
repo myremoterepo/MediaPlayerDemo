@@ -17,7 +17,7 @@ public class PSListenerImpl implements PSMessageListener {
     private static final String TAG = PSListenerImpl.class.getSimpleName();
 
     private PlayerCallback mCallback;
-    private String session;
+    public static String session;
     private int mediaType;
     public final static Object mVideoLock = new Object();
 
@@ -37,6 +37,11 @@ public class PSListenerImpl implements PSMessageListener {
             mediaType = mediaInfo.mediaType;
             if (mediaInfo.mediaType == MediaInfo.MEDIA_TYPE_VIDEO) {
                 Log.d(TAG, "start play video");
+                if (mediaInfo.session.startsWith("iqiyi")) {
+                    Log.d(TAG, "unsupport video source");
+                    return result;
+                }
+
                 PSCallbackInfoManager.getInstance().updateMediaInfo(mediaInfo);
                 mCallback.startPlay(mediaInfo.session, mediaInfo.videoInfo.uri, mediaInfo.videoInfo.history);
             } else if (mediaInfo.mediaType == MediaInfo.MEDIA_TYPE_AUDIO) {
