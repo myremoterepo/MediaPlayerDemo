@@ -253,7 +253,6 @@ public class MainActivity extends AppCompatActivity implements PSListenerImpl.Pl
             }
         };
         PSServiceManager.getInstance().init(this, configInfo, stateCallback, psListener);
-        PSServiceManager.getInstance().setAudioEnable(true);
     }
 
     @Override
