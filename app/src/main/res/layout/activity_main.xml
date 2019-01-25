@@ -42,33 +42,28 @@
         android:layout_marginTop="10dp"
         android:layout_marginRight="10dp"
         android:layout_marginEnd="10dp"
-        android:textSize="15sp"/>
+        android:textSize="15sp"
+        android:visibility="gone"/>
     <TextView
-        android:id="@+id/pushservice_state"
+        android:id="@+id/im_state"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_alignParentRight="true"
-        android:text="@string/pushservice_dead"
+        android:text="@string/im_dead"
         android:layout_below="@id/airplay_state"
         android:layout_alignParentEnd="true"
         android:layout_marginTop="10dp"
         android:layout_marginRight="10dp"
         android:layout_marginEnd="10dp"
-        android:textSize="15sp"/>
+        android:textSize="15sp"
+        android:visibility="gone"/>
     
     <VideoView
         android:id="@+id/video_player"
         android:layout_width="192dp"
         android:layout_height="108dp"
-        android:layout_below="@id/pushservice_state"/>
-
-    <SurfaceView
-        android:id="@+id/video_surface"
-        android:layout_width="108dp"
-        android:layout_height="192dp"
-        android:layout_below="@id/pushservice_state"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentEnd="true"/>
+        android:layout_below="@id/btn_start"
+        android:layout_marginTop="5dp"/>
 
     <RelativeLayout
         android:layout_width="wrap_content"
@@ -78,7 +73,7 @@
             android:id="@+id/control_playback"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/control_playback"/>
+            android:text="@string/control_pause"/>
         <Button
             android:id="@+id/control_stop"
             android:layout_width="wrap_content"

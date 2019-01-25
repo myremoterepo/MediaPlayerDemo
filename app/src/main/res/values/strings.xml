@@ -3,9 +3,13 @@
     <string name="start">开始</string>
     <string name="stop">停止</string>
     <string name="qimo_dead">qimo已停止</string>
+    <string name="qimo_alive">qimo运行中</string>
     <string name="airplay_dead">airplay已停止</string>
-    <string name="pushservice_dead">pushservice已停止</string>
-    <string name="control_playback">暂停</string>
+    <string name="airplay_alive">airplay运行中</string>
+    <string name="im_dead">IM已停止</string>
+    <string name="im_alive">IM运行中</string>
+    <string name="control_pause">暂停</string>
+    <string name="control_resume">播放</string>
     <string name="control_stop">退出</string>
     <string name="control_seek">快进</string>
 </resources>

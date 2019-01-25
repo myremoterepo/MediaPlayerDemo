@@ -1,6 +1,5 @@
 package com.iqiyi.fzf.mediaplayerdemo;
 
-
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Surface;
@@ -16,12 +15,10 @@ import java.util.List;
 public class PSListenerImpl implements PSMessageListener {
     private static final String TAG = PSListenerImpl.class.getSimpleName();
 
-    private PlayerCallback mCallback;
-    public static String session;
-    private int mediaType;
-    public final static Object mVideoLock = new Object();
+    private PushScreenCallback mCallback;
+    private String session = null;
 
-    public PSListenerImpl(PlayerCallback callback) {
+    public PSListenerImpl(PushScreenCallback callback) {
         mCallback = callback;
     }
 
@@ -29,59 +26,67 @@ public class PSListenerImpl implements PSMessageListener {
     public QimoExecutionResult onStart(MediaInfo mediaInfo) {
         Log.d(TAG, "onStart mediainfo=" + mediaInfo.session);
         QimoExecutionResult result = new QimoExecutionResult();
-        synchronized (mVideoLock) {
-            if (!TextUtils.isEmpty(session)) {
-                stopPreviousVideo(session);
-            }
-            session = mediaInfo.session;
-            mediaType = mediaInfo.mediaType;
-            if (mediaInfo.mediaType == MediaInfo.MEDIA_TYPE_VIDEO) {
-                Log.d(TAG, "start play video");
-                if (mediaInfo.session.startsWith("iqiyi")) {
-                    Log.d(TAG, "unsupport video source");
-                    return result;
-                }
-
-                PSCallbackInfoManager.getInstance().updateMediaInfo(mediaInfo);
-                mCallback.startPlay(mediaInfo.session, mediaInfo.videoInfo.uri, mediaInfo.videoInfo.history);
-            } else if (mediaInfo.mediaType == MediaInfo.MEDIA_TYPE_AUDIO) {
-                Log.d(TAG, "start play audio");
-                PSCallbackInfoManager.getInstance().updateMediaInfo(mediaInfo);
-                mCallback.startAudio(mediaInfo.session);
-            } else if (mediaInfo.mediaType == MediaInfo.MEDIA_TYPE_PICTURE) {
-                Log.d(TAG, "start play picture");
-                PSCallbackInfoManager.getInstance().updateMediaInfo(mediaInfo);
-                mCallback.startPicture(mediaInfo.session);
-            } else if (mediaInfo.mediaType == MediaInfo.MEDIA_TYPE_MIRROR) {
-                Log.d(TAG, "start play mirror");
-                PSCallbackInfoManager.getInstance().updateMediaInfo(mediaInfo);
-                PSCallbackInfoManager.getInstance().setMeidaPlay(mediaInfo.session, 0);
+        if (!TextUtils.isEmpty(session)) {
+            boolean ret = stopPreviousVideo(session);
+            if (ret) {
+                session = null;
             } else {
-                Log.d(TAG, "unknown media type");
-                result.result = false;
-                return result;
+                Log.d(TAG, "stop previous video fail!");
             }
         }
+        if (mediaInfo.mediaType == MediaInfo.MEDIA_TYPE_VIDEO) {
+            Log.d(TAG, "start play video");
+            if (mediaInfo.session.startsWith("iqiyi")) {
+                Log.d(TAG, "qimo video:");
+                Log.d(TAG, "albumId=" + mediaInfo.videoInfo.albumId);
+                Log.d(TAG, "tvid=" + mediaInfo.videoInfo.tvId);
+                result.result = false;
+            }
+            session = mediaInfo.session;
+            PSCallbackInfoManager.getInstance().updateMediaInfo(mediaInfo);
+            boolean ret = mCallback.startPlay(mediaInfo.videoInfo.uri, mediaInfo.videoInfo.history);
+            if (ret) {
+                PSCallbackInfoManager.getInstance().setMeidaPlay(session, mCallback.getPosition());
+            }
+            result.result = ret;
+        } else {
+            Log.d(TAG, "not support mediaType=" + mediaInfo.mediaType);
+            result.result = false;
+        }
 
-        result.result = true;
         return result;
     }
 
-    private void stopPreviousVideo(String session) {
+    private boolean stopPreviousVideo(String session) {
         Log.d(TAG, "stopPreviousVideo session=" + session);
-        mCallback.stopPlay(session);
+        boolean ret = mCallback.stopPlay();
+        if (ret) {
+            PSCallbackInfoManager.getInstance().setMediaStop(session);
+        }
+        return ret;
     }
 
     @Override
     public void onStop() {
         Log.d(TAG, "onStop");
-        mCallback.stopPlay(session);
+        boolean ret = mCallback.stopPlay();
+        if (ret) {
+            PSCallbackInfoManager.getInstance().setMediaStop(session);
+            session = null;
+        } else {
+            Log.d(TAG, "stop fail session=" + session);
+        }
     }
 
     @Override
     public void onPause() {
         Log.d(TAG, "onPause");
-        mCallback.pausePlay(session);
+        boolean ret = mCallback.pausePlay();
+        if (ret) {
+            PSCallbackInfoManager.getInstance().setMediaPause(session, mCallback.getPosition());
+        } else {
+            Log.d(TAG, "pause fail session=" + session);
+        }
     }
 
     @Override
@@ -93,13 +98,18 @@ public class PSListenerImpl implements PSMessageListener {
     @Override
     public void onResume() {
         Log.d(TAG, "onResume");
-        mCallback.resumePlay(session);
+        boolean ret = mCallback.resumePlay();
+        if (ret) {
+            PSCallbackInfoManager.getInstance().setMeidaPlay(session, mCallback.getPosition());
+        } else {
+            Log.d(TAG, "resume fail session=" + session);
+        }
     }
 
     @Override
     public int onGetDuration() {
         Log.d(TAG, "onGetDuration");
-        return mCallback.getDuration(session);
+        return mCallback.getDuration();
     }
 
     @Override
@@ -283,15 +293,45 @@ public class PSListenerImpl implements PSMessageListener {
         return null;
     }
 
-    public interface PlayerCallback{
-        void startPlay(String session, String url, long history);
-        void stopPlay(String session);
-        void pausePlay(String session);
+    public PlayerCallback getPlayerCallback() {
+        return new PlayerCallBackImpl();
+    }
+
+    class PlayerCallBackImpl implements PlayerCallback {
+
+        @Override
+        public void onPlayerPrepared() {
+            PSCallbackInfoManager.getInstance().changeDuration(session, mCallback.getPosition(), mCallback.getDuration());
+        }
+
+        @Override
+        public void onPlayerPaused() {
+            PSCallbackInfoManager.getInstance().setMediaPause(session, mCallback.getPosition());
+        }
+
+        @Override
+        public void onPlayerResumed() {
+            PSCallbackInfoManager.getInstance().setMeidaPlay(session, mCallback.getPosition());
+        }
+
+        @Override
+        public void onPlayerStopped() {
+            PSCallbackInfoManager.getInstance().setMediaStop(session);
+        }
+    }
+
+    public interface PushScreenCallback {
+        boolean startPlay(String url, long history);
+
+        boolean stopPlay();
+
+        boolean pausePlay();
+
         void seekTo(int position);
 
-        void resumePlay(String session);
+        boolean resumePlay();
 
-        int getDuration(String session);
+        int getDuration();
 
         int getPosition();
 
@@ -300,10 +340,6 @@ public class PSListenerImpl implements PSMessageListener {
         int getVolume();
 
         void playback();
-
-        void startAudio(String session);
-
-        void startPicture(String session);
 
         float getRate();
 
