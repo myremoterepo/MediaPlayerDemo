@@ -1,8 +1,10 @@
 package com.iqiyi.fzf.mediaplayerdemo;
 
 import android.app.Service;
+import android.content.IntentFilter;
 import android.media.AudioManager;
 import android.media.MediaPlayer;
+import android.net.ConnectivityManager;
 import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
@@ -42,6 +44,7 @@ public class MainActivity extends AppCompatActivity implements PSListenerImpl.Pu
     private String mFeature = String.valueOf(QIMO_VIDEO_PUSH + QIMO_PICTURE_PUSH + QIMO_NETVIDEO_PUSH + DEVICE_RENAME + DEVICE_UPDATE_CHECK + FEEDBACK + EARPHONE + SUBTITLE + CEC + IGNORE_WIFI + HDMI_OUTPUT_ZOOM + REMOTE_FORBID + DEVICE_REBOOT + REMOTE_FORBID_INDIVIDUAL + SCREEN_CAPTURE + QIMO_OFFLINE + MIRROR_QUALITY + PICTURE_ZOOM + PLAYBACK_SPEED + DELAY_EXIT_VIDEO + WIFI_DISPLAY + OFFLINE_CACHE);
     private int curposition = 0;
     private PlayerCallback mPlayerCallback = null;
+    private StatusReceiver mStatusReceiver;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,6 +52,7 @@ public class MainActivity extends AppCompatActivity implements PSListenerImpl.Pu
         setContentView(R.layout.activity_main);
 
         initService();
+        initReceiver();
         audioManager = (AudioManager) getSystemService(Service.AUDIO_SERVICE);
         if (audioManager != null) {
             volumeMax = audioManager.getStreamMaxVolume(AudioManager.STREAM_MUSIC);
@@ -74,6 +78,13 @@ public class MainActivity extends AppCompatActivity implements PSListenerImpl.Pu
             }
         });
         mStart.performClick();
+    }
+
+    private void initReceiver() {
+        mStatusReceiver = new StatusReceiver();
+        IntentFilter filter = new IntentFilter();
+        filter.addAction(ConnectivityManager.CONNECTIVITY_ACTION);
+        registerReceiver(mStatusReceiver, filter);
     }
 
     private void initService() {
@@ -143,6 +154,7 @@ public class MainActivity extends AppCompatActivity implements PSListenerImpl.Pu
         PSServiceManager.getInstance().clear();
         mPlayer = null;
         mPlayerCallback = null;
+        unregisterReceiver(mStatusReceiver);
     }
 
     @Override
