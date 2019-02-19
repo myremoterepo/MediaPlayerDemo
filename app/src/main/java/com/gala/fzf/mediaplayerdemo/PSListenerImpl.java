@@ -1,13 +1,13 @@
-package com.iqiyi.fzf.mediaplayerdemo;
+package com.gala.fzf.mediaplayerdemo;
 
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.Surface;
 
-import com.tvguo.iqiyi.PSCallbackInfoManager;
-import com.tvguo.iqiyi.PSMessageListener;
-import com.tvguo.iqiyi.qimo.QimoExecutionResult;
-import com.tvguo.iqiyi.util.MediaInfo;
+import com.tvguo.gala.PSCallbackInfoManager;
+import com.tvguo.gala.PSMessageListener;
+import com.tvguo.gala.qimo.QimoExecutionResult;
+import com.tvguo.gala.util.MediaInfo;
 
 import java.io.ByteArrayOutputStream;
 import java.util.List;
@@ -24,7 +24,7 @@ public class PSListenerImpl implements PSMessageListener {
 
     @Override
     public QimoExecutionResult onStart(MediaInfo mediaInfo) {
-        Log.d(TAG, "onStart mediainfo=" + mediaInfo.session);
+        Log.d(TAG, "onStart mediainfo=" + mediaInfo.toString());
         QimoExecutionResult result = new QimoExecutionResult();
         if (!TextUtils.isEmpty(session)) {
             boolean ret = stopPreviousVideo(session);
@@ -34,15 +34,15 @@ public class PSListenerImpl implements PSMessageListener {
                 Log.d(TAG, "stop previous video fail!");
             }
         }
+        session = mediaInfo.session;
         if (mediaInfo.mediaType == MediaInfo.MEDIA_TYPE_VIDEO) {
             Log.d(TAG, "start play video");
-            if (mediaInfo.session.startsWith("iqiyi")) {
+            if (mediaInfo.session.startsWith("gala")) {
                 Log.d(TAG, "qimo video:");
                 Log.d(TAG, "albumId=" + mediaInfo.videoInfo.albumId);
                 Log.d(TAG, "tvid=" + mediaInfo.videoInfo.tvId);
                 result.result = false;
             }
-            session = mediaInfo.session;
             PSCallbackInfoManager.getInstance().updateMediaInfo(mediaInfo);
             boolean ret = mCallback.startPlay(mediaInfo.videoInfo.uri, mediaInfo.videoInfo.history);
             if (ret) {
@@ -51,6 +51,7 @@ public class PSListenerImpl implements PSMessageListener {
             result.result = ret;
         } else {
             Log.d(TAG, "not support mediaType=" + mediaInfo.mediaType);
+            PSCallbackInfoManager.getInstance().setMediaStop(session);
             result.result = false;
         }
 
@@ -286,6 +287,11 @@ public class PSListenerImpl implements PSMessageListener {
     public boolean onSetPlayMode(int i) {
         Log.d(TAG, "onSetPlayMode mode=" + i);
         return false;
+    }
+
+    @Override
+    public QimoExecutionResult onSetRes(String s) {
+        return new QimoExecutionResult();
     }
 
     @Override

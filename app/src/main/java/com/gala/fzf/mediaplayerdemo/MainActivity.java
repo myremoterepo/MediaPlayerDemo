@@ -1,4 +1,4 @@
-package com.iqiyi.fzf.mediaplayerdemo;
+package com.gala.fzf.mediaplayerdemo;
 
 import android.app.Service;
 import android.content.IntentFilter;
@@ -9,6 +9,7 @@ import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
 import android.text.TextUtils;
+import android.util.DisplayMetrics;
 import android.util.Log;
 import android.view.Surface;
 import android.view.View;
@@ -18,8 +19,9 @@ import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.VideoView;
 
-import com.tvguo.iqiyi.PSConfigInfo;
-import com.tvguo.iqiyi.PSServiceManager;
+
+import com.tvguo.gala.PSConfigInfo;
+import com.tvguo.gala.PSServiceManager;
 
 import java.io.ByteArrayOutputStream;
 import java.util.concurrent.Callable;
@@ -27,7 +29,11 @@ import java.util.concurrent.FutureTask;
 
 public class MainActivity extends AppCompatActivity implements PSListenerImpl.PushScreenCallback {
     private static final String TAG = MainActivity.class.getSimpleName();
-    public static final int QIMO_VIDEO_PUSH = 0x000001, QIMO_PICTURE_PUSH = 0x000002, QIMO_NETVIDEO_PUSH = 0x000008, DEVICE_RENAME = 0x000010, DEVICE_UPDATE_CHECK = 0x000020, FEEDBACK = 0x000040, EARPHONE = 0x000080, SUBTITLE = 0x000100, CEC = 0x000200, IGNORE_WIFI = 0x000400, HDMI_OUTPUT_ZOOM = 0x000800, REMOTE_FORBID = 0x001000, DEVICE_REBOOT = 0x002000, REMOTE_FORBID_INDIVIDUAL = 0x004000, SCREEN_CAPTURE = 0x008000, QIMO_OFFLINE = 0x010000, MIRROR_QUALITY = 0x020000, PICTURE_ZOOM = 0x040000, PLAYBACK_SPEED = 0x080000, DELAY_EXIT_VIDEO = 0x100000, WIFI_DISPLAY = 0x200000, OFFLINE_CACHE = 0x400000;
+    public static final int QIMO_VIDEO_PUSH = 0x000001, QIMO_PICTURE_PUSH = 0x000002, QIMO_NETVIDEO_PUSH = 0x000008, DEVICE_RENAME = 0x000010,
+            DEVICE_UPDATE_CHECK = 0x000020, FEEDBACK = 0x000040, EARPHONE = 0x000080, SUBTITLE = 0x000100, CEC = 0x000200, IGNORE_WIFI = 0x000400,
+            HDMI_OUTPUT_ZOOM = 0x000800, REMOTE_FORBID = 0x001000, DEVICE_REBOOT = 0x002000, REMOTE_FORBID_INDIVIDUAL = 0x004000, SCREEN_CAPTURE =
+            0x008000, QIMO_OFFLINE = 0x010000, MIRROR_QUALITY = 0x020000, PICTURE_ZOOM = 0x040000, PLAYBACK_SPEED = 0x080000, DELAY_EXIT_VIDEO =
+            0x100000, WIFI_DISPLAY = 0x200000, OFFLINE_CACHE = 0x400000;
 
     private Button mStart;
     private Button mStop;
@@ -45,6 +51,8 @@ public class MainActivity extends AppCompatActivity implements PSListenerImpl.Pu
     private int curposition = 0;
     private PlayerCallback mPlayerCallback = null;
     private StatusReceiver mStatusReceiver;
+    private Button mInit;
+    private Button mClear;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -60,6 +68,8 @@ public class MainActivity extends AppCompatActivity implements PSListenerImpl.Pu
 
         mStart = findViewById(R.id.btn_start);
         mStop = findViewById(R.id.btn_end);
+        mInit = findViewById(R.id.btn_init);
+        mClear = findViewById(R.id.btn_clear);
         mQimoState = findViewById(R.id.qimo_state);
         mAirplayState = findViewById(R.id.airplay_state);
         mIMState = findViewById(R.id.im_state);
@@ -75,6 +85,18 @@ public class MainActivity extends AppCompatActivity implements PSListenerImpl.Pu
             @Override
             public void onClick(View v) {
                 PSServiceManager.getInstance().stopService();
+            }
+        });
+        mInit.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                initService();
+            }
+        });
+        mClear.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                PSServiceManager.getInstance().clear();
             }
         });
         mStart.performClick();
@@ -98,14 +120,19 @@ public class MainActivity extends AppCompatActivity implements PSListenerImpl.Pu
         configInfo.targetInterface = "wlan0";
         configInfo.appVersion = "521035";
         configInfo.featureBitmap = mFeature;
+        configInfo.mGalaDevice = 2;
+        configInfo.mGalaVersion = 3;
         PSListenerImpl psListener = new PSListenerImpl(this);
         mPlayerCallback = psListener.getPlayerCallback();
+//        PSServiceManager.getInstance().setLibPath("/data/pushscreen");
         PSServiceManager.getInstance().init(this, configInfo, new PushScreenServiceState(), psListener);
     }
 
     private void createPlayer() {
         WindowManager wm1 = this.getWindowManager();
-        int winWidth = wm1.getDefaultDisplay().getWidth();
+        DisplayMetrics outMetrics = new DisplayMetrics();
+        wm1.getDefaultDisplay().getMetrics(outMetrics);
+        int winWidth = outMetrics.widthPixels;
         mPlayer = findViewById(R.id.video_player);
         RelativeLayout.LayoutParams rlParams = (RelativeLayout.LayoutParams) mPlayer.getLayoutParams();
         rlParams.width = winWidth;
@@ -327,7 +354,8 @@ public class MainActivity extends AppCompatActivity implements PSListenerImpl.Pu
     }
 
     @Override
-    public void changeMirrorSize(final int width, final int height) {}
+    public void changeMirrorSize(final int width, final int height) {
+    }
 
 
     // 投屏service的运行状态监听

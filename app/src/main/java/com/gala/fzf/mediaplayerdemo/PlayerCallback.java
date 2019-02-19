@@ -1,4 +1,4 @@
-package com.iqiyi.fzf.mediaplayerdemo;
+package com.gala.fzf.mediaplayerdemo;
 /**
  * 播放器的播放状态监听接口
  * */

@@ -2,6 +2,8 @@
     <string name="app_name">MediaPlayerDemo</string>
     <string name="start">开始</string>
     <string name="stop">停止</string>
+    <string name="init">init</string>
+    <string name="clear">clear</string>
     <string name="qimo_dead">qimo已停止</string>
     <string name="qimo_alive">qimo运行中</string>
     <string name="airplay_dead">airplay已停止</string>

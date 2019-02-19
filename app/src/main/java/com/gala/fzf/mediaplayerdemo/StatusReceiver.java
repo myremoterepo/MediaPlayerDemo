@@ -1,4 +1,4 @@
-package com.iqiyi.fzf.mediaplayerdemo;
+package com.gala.fzf.mediaplayerdemo;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -7,7 +7,8 @@ import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.util.Log;
 
-import com.tvguo.iqiyi.PSServiceManager;
+import com.tvguo.gala.PSServiceManager;
+
 
 public class StatusReceiver extends BroadcastReceiver {
     private static final String TAG = StatusReceiver.class.getSimpleName();
