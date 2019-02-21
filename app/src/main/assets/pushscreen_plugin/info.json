@@ -1,13 +1,13 @@
 {
   "name": "PushScreenProtocol",
   "description": "Airplay&DLNA&Qimo&QPlay",
-  "version": "1.0.0.75",
+  "version": "1.0.0.78",
   "apiVersion": "1.0.0.6",
   "entryClass": "com.tvguo.PSPPluginEntry",
   "files": [
     {
       "name": "plugin.jar",
-      "md5": "fc870bd6cce23c203cf370ec49359b4d",
+      "md5": "e905ca33d72234993fd716c500745c44",
       "essential": true
     }
   ]
